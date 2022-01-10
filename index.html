@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    
+    <div id="app" x-data="todos()">
+      <form @submit.prevent="addNewTask()">
+          <input placeholder="new todo item" type="text" x-model="task" />
+          <button type="submit">Add new task</button>
+      </form>
+      <ul>
+          <template x-for="todo in todos" :key="todo.id">
+              <li :class="{ 'is-complete': todo.isComplete === true }">
+                  <input type="checkbox" x-model="todo.isComplete" />
+                  <span x-text="todo.task"></span>
+                  <button @click="removeTask(todo.id)">Delete</button>
+              </li>
+          </template>
+      </ul>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+    <script>
+      function todos() {
+        return {
+            //data
+            increment: 6,
+            task: '',
+            todos: [
+              {
+                  id: 1,
+                  task: 'Look/Feel - vanilla CSS or CSS framework',
+                  isComplete: true
+              },
+              {
+                  id: 2,
+                  task: 'LocalStorage',
+                  isComplete: false
+              },
+              {
+                  id: 3,
+                  task: 'Edit todo items',
+                  isComplete: false
+              },
+              {
+                  id: 4,
+                  task: 'Google Auth Login',
+                  isComplete: false
+              },
+              {
+                  id: 5,
+                  task: 'LocalStorage 1st then Cloud(firebase) if logged in',
+                  isComplete: false
+              }
+          ],
+
+          addNewTask() {
+              //Return if empty
+              if (this.task.trim() === '') return;
+              //Add new todo and clear task
+              this.todos.push({
+                  id: this.increment++,
+                  task: this.task,
+                  isComplete: false
+              });
+              this.task = '';
+          },
+
+          removeTask(todoToRemove) {
+              this.todos = this.todos.filter(todo => todo.id != todoToRemove);
+          }
+
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -8,7 +8,10 @@
   </head>
   <body>
     
-    <div id="app" x-data="todos()">
+    <div id="app" x-data="todos()" x-init="init">
+
+      <h1 id="netWarning">No Internet</h1>
+
       <form @submit.prevent="addNewTask()">
           <input placeholder="new todo item" type="text" x-model="task" />
           <button type="submit">Add new task</button>
@@ -17,12 +20,21 @@
           <template x-for="todo in todos" :key="todo.id">
               <li :class="{ 'is-complete': todo.isComplete === true }">
                   <input type="checkbox" x-model="todo.isComplete" />
-                  <span x-text="todo.task"></span>
+                  <span x-model="todo.task" x-text="todo.task" contenteditable></span>
                   <button @click="removeTask(todo.id)">Delete</button>
               </li>
           </template>
       </ul>
+
+      <button @click="saveToLocalStorage()">Save to Local Storage</button>
+      <button @click="readFromLocalStorage()">Read from Local Storage</button>
+      <button @click="clearCatFromLocalStorage()">Clear cat from Local Storage</button>
+      <button @click="clearAllFromLocalStorage()">Clear all from Local Storage</button>
+      <button @click="isOnline()">isOnline</button>
+
     </div>
+
+
 
     <script type="module" src="/main.js"></script>
     <script>
@@ -31,6 +43,7 @@
             //data
             increment: 6,
             task: '',
+            online: true,
             todos: [
               {
                   id: 1,
@@ -58,6 +71,17 @@
                   isComplete: false
               }
           ],
+          
+          init() {
+            
+            //update todos from LocalStorage
+            this.readFromLocalStorage()
+
+            //this.$watch(this.todos, value => {
+            //  value => console.log(value)
+              //this.saveToLocalStorage()
+            //})
+          },
 
           addNewTask() {
               //Return if empty
@@ -65,15 +89,54 @@
               //Add new todo and clear task
               this.todos.push({
                   id: this.increment++,
+                  //id: this.todos. + 1,
+                  //id: Math.max(this.todos.id),
                   task: this.task,
                   isComplete: false
               });
               this.task = '';
+
+              // persist data
+              this.saveToLocalStorage()
           },
 
           removeTask(todoToRemove) {
               this.todos = this.todos.filter(todo => todo.id != todoToRemove);
-          }
+
+              // persist data
+              this.saveToLocalStorage()
+          },
+
+          printTodos() {
+            console.log(this.todos)
+          },
+
+          alertTodos() {
+            alert(this.todos)
+          },
+
+          isOnline() {
+            alert(window.navigator.onLine)
+          },
+
+          saveToLocalStorage() {
+            localStorage.setItem('todos', JSON.stringify(this.todos))
+          },
+
+          readFromLocalStorage() {
+            const todos = JSON.parse(localStorage.getItem('todos'))
+
+            if (todos) this.todos = todos
+          },
+
+          clearCatFromLocalStorage() {
+            localStorage.removeItem('cat')
+          },
+
+          clearAllFromLocalStorage() {
+            localStorage.clear()
+          },
+
 
         }
       }
